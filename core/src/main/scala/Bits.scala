@@ -44,6 +44,18 @@ class UInt(width: Option[Int]) extends Bits(width) {
     println(s"[$info] Calling + on $this with $n gives resulting width $w")
     new UInt(w)
   }
+
+  final def -(n: UInt): UInt = macro SourceInfoTransform.nArg
+
+  def do_-(n: UInt)(implicit info: FakeSourceInfo): UInt = {
+    val w = (this.width, n.width) match {
+      case (None, _) => None
+      case (_, None) => None
+      case (Some(x), Some(y)) => Some(x - y)
+    }
+    println(s"[$info] Calling - on $this with $n gives resulting width $w")
+    new UInt(w)
+  }
 }
 
 // Normally this would be in a different file, but its here to padd up the size of the
@@ -60,5 +72,9 @@ object Main {
 
     val z = x + y
     println(z)
+
+    val a = new UInt(Some(2))
+    val b = x - a
+    println(b)
   }
 }
