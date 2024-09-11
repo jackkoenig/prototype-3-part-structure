@@ -1,12 +1,11 @@
 
 package fakechisel
 
-import fakechisel.macros.SourceInfoTransform
+private[fakechisel] trait UIntImpl { self: Bits =>
 
-class UInt(width: Option[Int]) extends Bits(width) {
-  final def +(n: UInt): UInt = macro SourceInfoTransform.nArg
+  def width: Option[Int]
 
-  def do_+(n: UInt)(implicit info: FakeSourceInfo): UInt = {
+  protected def _plusImpl(n: UInt)(implicit info: FakeSourceInfo): UInt = {
     val w = (this.width, n.width) match {
       case (None, _) => None
       case (_, None) => None
@@ -16,9 +15,7 @@ class UInt(width: Option[Int]) extends Bits(width) {
     new UInt(w)
   }
 
-  final def -(n: UInt): UInt = macro SourceInfoTransform.nArg
-
-  def do_-(n: UInt)(implicit info: FakeSourceInfo): UInt = {
+  protected def _minusImpl(n: UInt)(implicit info: FakeSourceInfo): UInt = {
     val w = (this.width, n.width) match {
       case (None, _) => None
       case (_, None) => None
