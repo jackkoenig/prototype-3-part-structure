@@ -62,7 +62,7 @@ object Main {
     val b = x - a
     println(b)
 
-    val c = x(2)
+    val c = x(2)(0)
     println(c)
   }
 }
