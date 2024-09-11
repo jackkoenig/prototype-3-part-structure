@@ -1,19 +1,13 @@
 
 package fakechisel
 
-import fakechisel.macros.SourceInfoTransform
+private[fakechisel] trait BitsImpl {
 
-abstract class Bits(val width: Option[Int]) {
+  def width: Option[Int]
 
   override def toString: String = s"Bits($width)"
 
-  final def tail(n: Int): UInt = macro SourceInfoTransform.nArg
-
-  final def head(n: Int): UInt = macro SourceInfoTransform.nArg
-
-  final def apply(n: Int): UInt = macro SourceInfoTransform.nArg
-
-  def do_tail(n: Int)(implicit info: FakeSourceInfo): UInt = {
+  protected def _tailImpl(n: Int)(implicit info: FakeSourceInfo): UInt = {
     val w = width match {
       case Some(x) =>
         require(x >= n, s"Can't tail($n) for width $x < $n")
@@ -24,7 +18,7 @@ abstract class Bits(val width: Option[Int]) {
     new UInt(w)
   }
 
-  def do_head(n: Int)(implicit info: FakeSourceInfo): UInt = {
+  protected def _headImpl(n: Int)(implicit info: FakeSourceInfo): UInt = {
     width match {
       case Some(x) => require(x >= n, s"Can't head($n) for width $x < $n")
       case None => ()
@@ -33,7 +27,7 @@ abstract class Bits(val width: Option[Int]) {
     new UInt(Some(n))
   }
 
-  def do_apply(n: Int)(implicit info: FakeSourceInfo): UInt = {
+  protected def _applyImpl(n: Int)(implicit info: FakeSourceInfo): UInt = {
     width match {
       case Some(x) => require(x > n, s"Can't extract bit $n for width $x")
       case None => ()
