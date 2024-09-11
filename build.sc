@@ -6,17 +6,20 @@ import mill.define.Cross
 
 object v {
   val scalaCrossVersions = Seq(
-    "2.13.14"
+    "2.13.14",
+    "3.3.3"
   )
 
-  def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:$scalaVersion"
+  def scalaReflect(scalaVersion: String): Agg[Dep] =
+    if (scalaVersion.startsWith("2")) Agg(ivy"org.scala-lang:scala-reflect:$scalaVersion")
+    else Agg.empty[Dep]
 }
 
 object macros extends Cross[Macros](v.scalaCrossVersions)
 
 trait Macros extends CrossSbtModule {
 
-  override def ivyDeps = T { Agg(v.scalaReflect(crossScalaVersion)) }
+  override def ivyDeps = T { v.scalaReflect(crossScalaVersion) }
 }
 
 object core extends Cross[Core](v.scalaCrossVersions)
