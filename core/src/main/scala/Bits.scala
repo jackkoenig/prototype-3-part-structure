@@ -11,6 +11,8 @@ abstract class Bits(val width: Option[Int]) {
 
   final def head(n: Int): UInt = macro SourceInfoTransform.nArg
 
+  final def apply(n: Int): UInt = macro SourceInfoTransform.nArg
+
   def do_tail(n: Int)(implicit info: FakeSourceInfo): UInt = {
     val w = width match {
       case Some(x) =>
@@ -29,6 +31,15 @@ abstract class Bits(val width: Option[Int]) {
     }
     println(s"[$info] Calling head on $this with $n gives resulting width $n")
     new UInt(Some(n))
+  }
+
+  def do_apply(n: Int)(implicit info: FakeSourceInfo): UInt = {
+    width match {
+      case Some(x) => require(x > n, s"Can't extract bit $n for width $x")
+      case None => ()
+    }
+    println(s"[$info] Calling apply on $this with $n")
+    new UInt(Some(1))
   }
 }
 
@@ -50,5 +61,8 @@ object Main {
     val a = new UInt(Some(2))
     val b = x - a
     println(b)
+
+    val c = x(2)
+    println(c)
   }
 }
