@@ -3,7 +3,7 @@ package fakechisel
 
 import fakechisel.macros.SourceInfoTransform
 
-abstract class Bits(val width: Option[Int]) {
+abstract class Bits(val width: Option[Int]) extends BitsImpl {
 
   override def toString: String = s"Bits($width)"
 
@@ -13,34 +13,11 @@ abstract class Bits(val width: Option[Int]) {
 
   final def apply(n: Int): UInt = macro SourceInfoTransform.nArg
 
-  def do_tail(n: Int)(implicit info: FakeSourceInfo): UInt = {
-    val w = width match {
-      case Some(x) =>
-        require(x >= n, s"Can't tail($n) for width $x < $n")
-        Some(x - n)
-      case None => None
-    }
-    println(s"[$info] Calling tail on $this with $n gives resulting width $w")
-    new UInt(w)
-  }
+  def do_tail(n: Int)(implicit info: FakeSourceInfo): UInt = _tailImpl(n)
 
-  def do_head(n: Int)(implicit info: FakeSourceInfo): UInt = {
-    width match {
-      case Some(x) => require(x >= n, s"Can't head($n) for width $x < $n")
-      case None => ()
-    }
-    println(s"[$info] Calling head on $this with $n gives resulting width $n")
-    new UInt(Some(n))
-  }
+  def do_head(n: Int)(implicit info: FakeSourceInfo): UInt = _headImpl(n)
 
-  def do_apply(n: Int)(implicit info: FakeSourceInfo): UInt = {
-    width match {
-      case Some(x) => require(x > n, s"Can't extract bit $n for width $x")
-      case None => ()
-    }
-    println(s"[$info] Calling apply on $this with $n")
-    new UInt(Some(1))
-  }
+  def do_apply(n: Int)(implicit info: FakeSourceInfo): UInt = _applyImpl(n)
 }
 
 // Normally this would be in a different file, but its here to padd up the size of the
